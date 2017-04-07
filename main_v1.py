@@ -16,28 +16,30 @@ from tkinter import *
 
 def clavier(evenement):
     """Gère les événements clavier correspondant à l'appui sur une touche"""
-    touche = evenement.keysym.upper()
-    if touche == "Q":
-        if deplacement_possible(GAUCHE):
-            deplacer(GAUCHE)
-        else:
-            avancer_au_maximum(GAUCHE)
-    elif touche == "D":
-        if deplacement_possible(DROITE):
-            deplacer(DROITE)
-        else:
-            avancer_au_maximum(DROITE)
-    elif touche == "Z":
-        if deplacement_possible(HAUT):
-            deplacer(HAUT)
-    elif touche == "SPACE":
-        frappe()
+    global sprite_a_charger, imagesFrappeGauche, imagesFrappeDroite
+    if (sprite_a_charger not in imagesFrappeGauche) and (sprite_a_charger not in imagesFrappeDroite):
+        touche = evenement.keysym.upper()
+        if touche == "Q":
+            if deplacement_possible(GAUCHE):
+                deplacer(GAUCHE)
+            else:
+                avancer_au_maximum(GAUCHE)
+        elif touche == "D":
+            if deplacement_possible(DROITE):
+                deplacer(DROITE)
+            else:
+                avancer_au_maximum(DROITE)
+        elif touche == "Z":
+            if deplacement_possible(HAUT):
+                deplacer(HAUT)
+        elif touche == "SPACE":
+            frappe()
 
 def clavier_relachement(evenement):
     """Gère les événements clavier correspondant au relâchement d'une touche"""
     global joueur1
     global sprite_a_charger, imagesGauche, imagesDroite
-    if evenement.keysym.upper() != "SPACE":     # Si le personnage n'est pas en train d'attaquer
+    if (sprite_a_charger not in imagesFrappeGauche) and (sprite_a_charger not in imagesFrappeDroite):     # Si le personnage n'est pas en train d'attaquer
         if not en_l_air:    # Si le personnage n'est pas en l'air mais bien sur terre
             if sprite_a_charger in imagesGauche:
                 sprite_a_charger = imagesGauche[0]
