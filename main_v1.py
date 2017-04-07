@@ -6,6 +6,11 @@
         - Chargement de plusieurs sprites pour un même mouvement (fluidité)
         - Évolution du personnage dans un environnement spécifique, avec des bordures bien définies (collisions aux bords)
 """
+""" Version 2 :
+        - [EN COURS] Affichage des coups (animation)
+        - [EN ATTENTE] Gestion des points de vie (perte)
+        - [EN ATTENTE] Affichage des points de vie (barre de vie)
+"""
 
 from tkinter import *
 
@@ -25,19 +30,22 @@ def clavier(evenement):
     elif touche == "Z":
         if deplacement_possible(HAUT):
             deplacer(HAUT)
+    elif touche == "SPACE":
+        frappe()
 
 def clavier_relachement(evenement):
     """Gère les événements clavier correspondant au relâchement d'une touche"""
     global joueur1
     global sprite_a_charger, imagesGauche, imagesDroite
-    if not en_l_air:    # Si le personnage n'est pas en l'air mais bien sur terre
-        if sprite_a_charger in imagesGauche:
-            sprite_a_charger = imagesGauche[0]
-        else:
-            sprite_a_charger = imagesDroite[0]
-        # Lorsque le personnage est à l'arrêt, ne pas laisser le dernier sprite chargé (= en pleine marche),
-        # mais le remplacer par le premier sprite de la direction dans laquelle se déplace le personnage
-        canvas.itemconfigure(joueur1, image=sprite_a_charger)
+    if evenement.keysym.upper() != "SPACE":     # Si le personnage n'est pas en train d'attaquer
+        if not en_l_air:    # Si le personnage n'est pas en l'air mais bien sur terre
+            if sprite_a_charger in imagesGauche:
+                sprite_a_charger = imagesGauche[0]
+            else:
+                sprite_a_charger = imagesDroite[0]
+            # Lorsque le personnage est à l'arrêt, ne pas laisser le dernier sprite chargé (= en pleine marche),
+            # mais le remplacer par le premier sprite de la direction dans laquelle se déplace le personnage
+            canvas.itemconfigure(joueur1, image=sprite_a_charger)
 
 def deplacer(direction):
     """Déplace le personnage en fonction de la direction choisie"""
@@ -57,7 +65,7 @@ def deplacer(direction):
             canvas.move(joueur1, val_dep, 0)
         else:
             # Chargement du bon sprite
-            if sprite_a_charger in imagesDroite:    # Si le déplacement se faisait vers la gauche
+            if sprite_a_charger in imagesDroite:    # Si le déplacement se faisait vers la droite
                 indice_sprite = imagesDroite.index(sprite_a_charger)
                 sprite_a_charger = imagesDroite[indice_sprite+1] if indice_sprite+1 < len(imagesDroite) else imagesDroite[0]
             else:
@@ -68,6 +76,7 @@ def deplacer(direction):
             canvas.move(joueur1, val_dep, 0)
     elif direction == HAUT:
         sauter()
+    
 
 def avancer_au_maximum(direction):
     global DIM_FEN
@@ -122,6 +131,47 @@ def deplacement_possible(direction):
         return False
     return True
 
+def frappe():
+    global joueur1
+    global sprite_a_charger, imagesGauche, imagesDroite, imagesFrappeGauche, imagesFrappeDroite
+
+    # On récupère la direction du personnage avant le coup
+    if (sprite_a_charger in imagesGauche) or (sprite_a_charger in imagesFrappeGauche):
+        direction_precedente = GAUCHE
+    elif (sprite_a_charger in imagesDroite) or (sprite_a_charger in imagesFrappeDroite):
+        direction_precedente = DROITE
+
+    # On vérifie si le sprite qui était à charger est un sprite de coup
+    # -> si c'est le cas, on récupère l'indice de ce sprite dans la liste d'images de coups correspondante
+    # -> on ajoute 1 à l'indice pour avoir l'image suivante
+    indice_sprite = 0
+    if sprite_a_charger in imagesFrappeGauche:
+        indice_sprite = imagesFrappeGauche.index(sprite_a_charger) + 1
+    elif sprite_a_charger in imagesFrappeDroite:
+        indice_sprite = imagesFrappeDroite.index(sprite_a_charger) + 1
+
+    # Si l'indice du sprite à afficher est bien inférieur à la taille de la liste des images de coups (-> s'il reste des images de coup à afficher)
+    if indice_sprite < len(imagesGauche):
+        if direction_precedente == GAUCHE:
+            sprite_a_charger = imagesFrappeGauche[ indice_sprite ]
+        elif direction_precedente == DROITE:
+            sprite_a_charger = imagesFrappeDroite[ indice_sprite ]
+    # Sinon si toutes les images ont été affichées, on affiche l'image de départ (au repos) dans la direction du personnage
+    else:
+        if direction_precedente == GAUCHE:
+            sprite_a_charger = imagesGauche[0]
+        elif direction_precedente == DROITE:
+            sprite_a_charger = imagesDroite[0]
+
+    # Chargement du bon sprite
+    canvas.itemconfigure(joueur1, image=sprite_a_charger)
+
+    # Si toutes les images ont été affichées
+    if indice_sprite < len(imagesFrappeGauche):
+        # -> on rappelle la fonction après 140ms
+        fenetre.after(140, frappe)
+    
+    
 # CONSTANTES
 DIM_FEN = (1080, 720)
 DIM_PERSO = (35, 60)
@@ -175,6 +225,15 @@ for chemin in cheminImagesSautGauche:
     imagesSautGauche.append( PhotoImage(file=chemin) )
 for chemin in cheminImagesSautDroite:
     imagesSautDroite.append( PhotoImage(file=chemin) )
+
+    # Sprites d'attaques
+cheminImagesFrappeGauche = ["img/perso/1/frappe/G/FG{}.gif".format(i+1) for i in range(6)]
+cheminImagesFrappeDroite = ["img/perso/1/frappe/D/{}.gif".format(i+1) for i in range(6)]
+imagesFrappeGauche, imagesFrappeDroite = list(), list()
+for chemin in cheminImagesFrappeGauche:
+    imagesFrappeGauche.append(PhotoImage(file=chemin))
+for chemin in cheminImagesFrappeDroite:
+    imagesFrappeDroite.append(PhotoImage(file=chemin))
 
 # Variables globales
 en_l_air = False
