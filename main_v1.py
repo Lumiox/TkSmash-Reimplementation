@@ -174,7 +174,7 @@ def frappe():
     # Si toutes les images ont été affichées
     if indice_sprite < len(imagesFrappeGauche):
         # -> on rappelle la fonction après 140ms
-        fenetre.after(140, frappe)
+        fenetre.after(100, frappe)
     
     
 # CONSTANTES
