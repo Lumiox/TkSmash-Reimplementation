@@ -76,7 +76,6 @@ def deplacer(direction):
             canvas.move(joueur1, val_dep, 0)
     elif direction == HAUT:
         sauter()
-    
 
 def avancer_au_maximum(direction):
     global DIM_FEN
@@ -136,9 +135,13 @@ def frappe():
     global sprite_a_charger, imagesGauche, imagesDroite, imagesFrappeGauche, imagesFrappeDroite
 
     # On récupère la direction du personnage avant le coup
-    if (sprite_a_charger in imagesGauche) or (sprite_a_charger in imagesFrappeGauche):
+    if (sprite_a_charger in imagesGauche) \
+    or (sprite_a_charger in imagesFrappeGauche) \
+    or (sprite_a_charger in imagesSautGauche):
         direction_precedente = GAUCHE
-    elif (sprite_a_charger in imagesDroite) or (sprite_a_charger in imagesFrappeDroite):
+    elif (sprite_a_charger in imagesDroite) \
+    or (sprite_a_charger in imagesFrappeDroite) \
+    or (sprite_a_charger in imagesSautDroite):
         direction_precedente = DROITE
 
     # On vérifie si le sprite qui était à charger est un sprite de coup
@@ -192,7 +195,7 @@ fenetre.geometry("{}x{}".format(DIM_FEN[0], DIM_FEN[1]))
 fenetre.resizable(width=False, height=False)
 
 # Création du canvas
-canvas = Canvas(fenetre, width=DIM_FEN[0], height=720, bg="white")
+canvas = Canvas(fenetre, width=DIM_FEN[0], height=DIM_FEN[1], bg="white")
 canvas.pack()
 
 # Affichage du fond
@@ -226,8 +229,8 @@ for chemin in cheminImagesSautGauche:
 for chemin in cheminImagesSautDroite:
     imagesSautDroite.append( PhotoImage(file=chemin) )
 
-    # Sprites d'attaques
-cheminImagesFrappeGauche = ["img/perso/1/frappe/G/FG{}.gif".format(i+1) for i in range(6)]
+    # Sprites d'attaque
+cheminImagesFrappeGauche = ["img/perso/1/frappe/G/{}.gif".format(i+1) for i in range(6)]
 cheminImagesFrappeDroite = ["img/perso/1/frappe/D/{}.gif".format(i+1) for i in range(6)]
 imagesFrappeGauche, imagesFrappeDroite = list(), list()
 for chemin in cheminImagesFrappeGauche:
