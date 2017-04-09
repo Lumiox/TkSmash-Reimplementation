@@ -156,7 +156,7 @@ def frappe():
         indice_sprite = imagesFrappeDroite.index(sprite_a_charger) + 1
 
     # Si l'indice du sprite à afficher est bien inférieur à la taille de la liste des images de coups (-> s'il reste des images de coup à afficher)
-    if indice_sprite < len(imagesGauche):
+    if indice_sprite < len(imagesFrappeGauche):
         if direction_precedente == GAUCHE:
             sprite_a_charger = imagesFrappeGauche[ indice_sprite ]
         elif direction_precedente == DROITE:
